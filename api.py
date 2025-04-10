@@ -1,37 +1,34 @@
-# app/api.py
-
 from fastapi import FastAPI, Request
-from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from engine.recommender import get_top_recommendations
+from pydantic import BaseModel
+import google.generativeai as genai
+import os
 
-app = FastAPI(
-    title="SHL Assessment Recommender API",
-    description="API to return top SHL assessments for a job description or query using Gemini embeddings.",
-    version="1.0.0"
-)
+# Configure Gemini API
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-# CORS setup (helpful if frontend or external service calls it)
+model = genai.GenerativeModel("gemini-pro")
+
+# FastAPI app
+app = FastAPI()
+
+# Allow frontend access
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Or replace with your frontend domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-class QueryRequest(BaseModel):
-    query: str
-    top_k: int = 10  # optional, default to 10
+# Request model
+class Query(BaseModel):
+    question: str
 
-@app.get("/")
-def read_root():
-    return {"message": "SHL Assessment Recommender API is running 🚀"}
-
-@app.post("/recommend")
-def recommend_assessments(request: QueryRequest):
+@app.post("/ask")
+async def ask_ai(query: Query):
     try:
-        results = get_top_recommendations(request.query, request.top_k)
-        return results.to_dict(orient="records")
+        response = model.generate_content(query.question)
+        return {"response": response.text}
     except Exception as e:
         return {"error": str(e)}
