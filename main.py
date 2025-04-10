@@ -25,6 +25,10 @@ app.add_middleware(
 class Query(BaseModel):
     question: str
 
+@app.get("/")
+def home():
+    return {"message": "Faang AI is running!"}
+
 @app.post("/ask")
 async def ask_ai(query: Query):
     try:
