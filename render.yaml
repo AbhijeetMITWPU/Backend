@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: ask-ai-gemini-backend
+    env: python
+    region: oregon
+    buildCommand: ""
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
+    envVars:
+      - key: GEMINI_API_KEY
+        value: AIzaSyAnmKLpcJ6hq6oRVopwQoDBofeWhs_Y7p4
