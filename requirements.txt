@@ -1,4 +1,8 @@
+fastapi
+uvicorn[standard]
 python-multipart
 google-generativeai
-fastapi
-uvicorn
+pydantic
+aiofiles
+httpx
+python-dotenv
